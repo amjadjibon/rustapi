@@ -1,5 +1,6 @@
 mod conf;
 mod route;
+mod handler;
 
 use conf::env;
 use tracing_subscriber;
