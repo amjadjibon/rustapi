@@ -1,7 +1,8 @@
 mod conf;
 
+use conf::env;
+
 fn main() {
-    conf::env::init();
-    println!("Hello, world!");
-    println!("DB_HOST: {}", conf::env::get("DB_HOST"));
+    env::init();
+    println!("DB_HOST: {}", env::get("DB_HOST"));
 }
