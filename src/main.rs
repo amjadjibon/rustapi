@@ -1,6 +1,11 @@
 mod conf;
 mod route;
 mod handler;
+mod dto;
+mod model;
+mod error;
+mod response;
+mod code;
 
 use conf::env;
 use tracing_subscriber;
