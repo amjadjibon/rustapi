@@ -13,3 +13,25 @@ pub struct User {
     pub updated_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
 }
+
+impl User {
+    pub fn new(
+        first_name: Option<String>,
+        last_name: Option<String>,
+        user_name: String,
+        email: String,
+        password: String,
+    ) -> Self {
+        Self {
+            id: 0,
+            first_name,
+            last_name,
+            user_name,
+            email,
+            password,
+            is_active: 1,
+            updated_at: None,
+            created_at: Utc::now(),
+        }
+    }
+}

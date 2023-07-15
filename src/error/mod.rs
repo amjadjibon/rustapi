@@ -1,4 +1,4 @@
 pub mod api;
-mod db;
-mod user;
+pub mod db;
+pub mod user;
 pub mod request;
