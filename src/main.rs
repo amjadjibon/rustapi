@@ -9,6 +9,7 @@ mod state;
 mod db;
 mod repo;
 mod service;
+mod utils;
 
 use std::sync::Arc;
 use tracing::log::info;

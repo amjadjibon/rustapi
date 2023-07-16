@@ -7,6 +7,7 @@ use crate::error::api::ApiError;
 use crate::error::user::UserError;
 use crate::repo::user::{UserRepository, UserRepositoryTrait};
 use crate::error::db::DbError;
+use crate::utils::password::hash_password;
 
 #[derive(Clone)]
 pub struct UserService {
@@ -31,7 +32,7 @@ impl UserService {
                     payload.last_name,
                     payload.user_name,
                     payload.email,
-                    payload.password,
+                    hash_password(payload.password),
                 );
 
                 let user = self.user_repo.create(user).await;
