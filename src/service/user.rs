@@ -1,13 +1,12 @@
-use crate::db::postgres::{Database, DatabaseTrait};
-use crate::dto::user::{UserReadDto, UserRegisterDto};
-// use crate::entity::user::User;
-use crate::error::api::ApiError;
-// use crate::error::db::DbError;
-use crate::error::user::UserError;
-use crate::repo::user::{UserRepository, UserRepositoryTrait};
 use sqlx::Error as SqlxError;
 use std::sync::Arc;
-use crate::model::user::User;
+
+use crate::db::postgres::Database;
+use crate::model::user::{User, UserReadDto, UserRegisterDto};
+use crate::error::api::ApiError;
+use crate::error::user::UserError;
+use crate::repo::user::{UserRepository, UserRepositoryTrait};
+use crate::error::db::DbError;
 
 #[derive(Clone)]
 pub struct UserService {
@@ -34,8 +33,26 @@ impl UserService {
                     payload.email,
                     payload.password,
                 );
-                Ok(UserReadDto::from(user))
+
+                let user = self.user_repo.create(user).await;
+
+                return match user {
+                    Ok(user) => Ok(UserReadDto::from(user)),
+                    Err(e) => match e {
+                        SqlxError::Database(e) => match e.code() {
+                            Some(code) => {
+                                if code == "23505" {
+                                    Err(DbError::UniqueConstraintViolation(e.to_string()))?
+                                } else {
+                                    Err(DbError::SomethingWentWrong(e.to_string()))?
+                                }
+                            }
+                            _ => Err(DbError::SomethingWentWrong(e.to_string()))?,
+                        },
+                        _ => Err(DbError::SomethingWentWrong(e.to_string()))?,
+                    },
+                };
             }
-        }
+        };
     }
 }

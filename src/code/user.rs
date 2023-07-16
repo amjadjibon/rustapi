@@ -22,6 +22,11 @@ pub fn get_user_code_object(code: &str) -> CodeObject {
             "User already exist".to_string(),
             400,
         ),
+        "CODE_UCF_400" => CodeObject::new(
+            "CODE_UCF_400".to_string(),
+            "User creation failed".to_string(),
+            400,
+        ),
         _ => CodeObject::new(
             "CODE_UE_400".to_string(),
             "Unknown error".to_string(),

@@ -12,6 +12,11 @@ pub fn get_common_code_object(code: &str) -> CodeObject {
             "JSON Rejection error".to_string(),
             400,
         ),
+        "CODE_UCV_409" => CodeObject::new(
+            "CODE_UCV_409".to_string(),
+            "Unique constraint violation error".to_string(),
+            409,
+        ),
         _ => CodeObject::new(
             "CODE_UE_400".to_string(),
             "Unknown error".to_string(),

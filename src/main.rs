@@ -1,7 +1,6 @@
 mod conf;
 mod route;
 mod handler;
-mod dto;
 mod model;
 mod error;
 mod response;
@@ -12,6 +11,7 @@ mod repo;
 mod service;
 
 use std::sync::Arc;
+use tracing::log::info;
 use conf::env;
 use tracing_subscriber;
 
@@ -30,7 +30,7 @@ async fn main() {
 
     let addr = format!("{}:{}", env::get("HOST"), env::get("PORT"));
 
-    println!("listening on: {}", addr);
+    info!("Listening on {}", addr);
 
     axum::Server::bind(&addr.parse().unwrap())
         .serve(route::root::routes(Arc::new(db_conn)))

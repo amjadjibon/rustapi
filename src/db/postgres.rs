@@ -19,7 +19,6 @@ pub trait DatabaseTrait {
 #[async_trait]
 impl DatabaseTrait for Database {
     async fn init() -> Result<Self, Error> {
-        println!("DSN: {}", env::get("DSN"));
         let database_url = env::get("DSN");
         let pool = PgPoolOptions::new()
             .acquire_timeout(std::time::Duration::from_secs(5))
