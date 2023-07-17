@@ -44,12 +44,13 @@ impl UserRepositoryTrait for UserRepository {
 
     async fn find_by_email(&self, email: String) -> Option<User> {
         let user = sqlx::query_as::<_, User>(
-            "SELECT * FROM user WHERE email = ?"
+            "SELECT * FROM \"user\" WHERE email = $1",
         )
             .bind(email)
             .fetch_optional(self.db_conn.get_pool())
             .await
             .unwrap_or(None);
+
         return user;
     }
 
