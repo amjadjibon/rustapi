@@ -3,7 +3,7 @@ use chrono;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
 use crate::conf::env;
 use crate::error::token::TokenError;
-use crate::model::login::UserLoginResponseDto;
+use crate::model::login::{UserLoginRefreshResponseDto, UserLoginResponseDto};
 
 #[derive(Clone)]
 pub struct TokenService {
@@ -41,8 +41,8 @@ impl TokenService {
     }
 
     pub fn login(&self, user: User) -> Result<UserLoginResponseDto, TokenError> {
-        let access_token = self.create_access_token(user.clone())?;
-        let refresh_token = self.create_refresh_token(user.clone())?;
+        let access_token = self.create_access_token(user.id)?;
+        let refresh_token = self.create_refresh_token(user.id)?;
 
         let response = UserLoginResponseDto {
             access_token,
@@ -54,9 +54,47 @@ impl TokenService {
         Ok(response)
     }
 
+    pub fn login_refresh(
+        &self,
+        refresh_token: String,
+    ) -> Result<UserLoginRefreshResponseDto, TokenError> {
+        let token_data = self.decode_token(&refresh_token)?;
 
-    fn create_access_token(&self, user: User) -> Result<String, TokenError> {
-        let claims = Claims{
+        if token_data.claims.token_type != "refresh_token" {
+            return Err(TokenError::InvalidTokenType);
+        }
+
+        let access_token = self.create_access_token(token_data.claims.user_id)?;
+        let refresh_token = self.create_refresh_token(token_data.claims.user_id)?;
+
+        let response = UserLoginRefreshResponseDto {
+            access_token,
+            refresh_token,
+            token_type: "Bearer".to_string(),
+            expires_in: self.access_token_exp,
+        };
+
+        Ok(response)
+    }
+
+    fn decode_token(&self, token: &str) -> Result<TokenData<Claims>, TokenError> {
+        let token_data = decode::<Claims>(
+            token,
+            &DecodingKey::from_secret(self.secret.as_ref()),
+            &Validation::default(),
+        );
+
+        let token_data = match token_data {
+            Ok(token_data) => token_data,
+            Err(e) => return Err(TokenError::TokenDecodeError(e.to_string())),
+        };
+
+        Ok(token_data)
+    }
+
+
+    fn create_access_token(&self, user_id: i32) -> Result<String, TokenError> {
+        let claims = Claims {
             aud: env::get("JWT_AUDIENCE"),
             exp: chrono::Utc::now().timestamp() as usize + self.access_token_exp as usize,
             iat: chrono::Utc::now().timestamp() as usize,
@@ -64,7 +102,7 @@ impl TokenService {
             nbf: chrono::Utc::now().timestamp() as usize,
             sub: env::get("JWT_SUBJECT"),
             token_type: "access_token".to_string(),
-            user_id: user.id,
+            user_id,
         };
 
         let access_token = encode(
@@ -81,8 +119,8 @@ impl TokenService {
         Ok(access_token)
     }
 
-    fn create_refresh_token(&self, user: User) -> Result<String, TokenError> {
-        let claims = Claims{
+    fn create_refresh_token(&self, user_id: i32) -> Result<String, TokenError> {
+        let claims = Claims {
             aud: env::get("JWT_AUDIENCE"),
             exp: chrono::Utc::now().timestamp() as usize + self.refresh_token_exp as usize,
             iat: chrono::Utc::now().timestamp() as usize,
@@ -90,7 +128,7 @@ impl TokenService {
             nbf: chrono::Utc::now().timestamp() as usize,
             sub: env::get("JWT_SUBJECT"),
             token_type: "refresh_token".to_string(),
-            user_id: user.id,
+            user_id,
         };
 
         let refresh_token = encode(

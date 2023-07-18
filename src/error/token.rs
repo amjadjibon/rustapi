@@ -13,6 +13,10 @@ pub enum TokenError {
     MissingToken,
     #[error("Token error: {0}")]
     TokenCreationError(String),
+    #[error("Token decode error: {0}")]
+    TokenDecodeError(String),
+    #[error("Invalid token type")]
+    InvalidTokenType,
 }
 
 impl IntoResponse for TokenError {
@@ -22,6 +26,8 @@ impl IntoResponse for TokenError {
             TokenError::TokenExpired => get_code_object("CODE_UE_400"),
             TokenError::MissingToken => get_code_object("CODE_UE_400"),
             TokenError::TokenCreationError(_) => get_code_object("CODE_UE_400"),
+            TokenError::TokenDecodeError(_) => get_code_object("CODE_UE_400"),
+            TokenError::InvalidTokenType => get_code_object("CODE_UE_400"),
         };
 
         ApiErrorResponse::send(status_code)
