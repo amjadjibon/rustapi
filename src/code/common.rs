@@ -1,6 +1,6 @@
 use crate::code::model::CodeObject;
 
-pub fn get_common_code_object(code: &str) -> CodeObject {
+pub fn get_code_object(code: &str) -> CodeObject {
     match code {
         "CODE_VE_400" => CodeObject::new(
             "CODE_VE_400".to_string(),

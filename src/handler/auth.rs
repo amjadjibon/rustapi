@@ -1,7 +1,7 @@
 use axum::extract::State;
-use axum::Json;
 use tracing::info;
-use crate::code::user::get_user_code_object;
+
+use crate::code::auth::get_code_object;
 use crate::error::api::ApiError;
 use crate::error::request::ValidatedRequest;
 use crate::error::user::UserError;
@@ -17,18 +17,17 @@ pub async fn login_handler(
 ) -> Result<ApiSuccessResponse<UserLoginResponseDto>, ApiError> {
     info!("Login user");
 
-    let user2 = token_state
+    let user = token_state
         .user_repo
         .find_by_email(payload.email)
         .await.ok_or(UserError::UserNotFound)?;
 
-    println!("{:?}", user2);
 
-    return match verify_password( &user2.password, &payload.password) {
+    return match verify_password(&user.password, &payload.password) {
         true => {
-            let token_res = token_state.token_service.login(user2)?;
+            let token_res = token_state.token_service.login(user)?;
             Ok(ApiSuccessResponse::send(
-                get_user_code_object("CODE_UAS_200"),
+                get_code_object("CODE_UAS_200"),
                 token_res,
             ))
         }
@@ -48,7 +47,7 @@ pub async fn login_refresh_handler(
     };
 
     Ok(ApiSuccessResponse::send(
-        get_user_code_object("CODE_AC_201"),
+        get_code_object("CODE_AC_201"),
         user,
     ))
 }
