@@ -10,6 +10,7 @@ mod db;
 mod repo;
 mod service;
 mod utils;
+mod middleware;
 
 use std::sync::Arc;
 use tracing::log::info;

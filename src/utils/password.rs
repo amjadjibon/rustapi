@@ -53,6 +53,28 @@ pub async fn verify(password: String, hash: String) -> anyhow::Result<bool> {
         .context("panic in verify()")?
 }
 
+// pub async fn verify2(password: &str, hash: &str) -> Result<Bool, PasswordError> {
+//     task::spawn_blocking(move || {
+//         let argon2 = Argon2::default();
+//         let parsed_hash = match PasswordHash::new(hash) {
+//             Ok(hash) => hash,
+//             Err(e) => return Err(PasswordError::InvalidPassword),
+//         };
+//
+//         let res = argon2
+//             .verify_password(password.as_bytes(), &parsed_hash)
+//             .is_ok();
+//
+//         match res {
+//             Ok(()) => Ok(true),
+//             Err(password_hash::Error::Password) => Ok(false),
+//             Err(_) => Err(PasswordError::InvalidPassword),
+//         }
+//     })
+//         .await
+//         .map_err(|e| PasswordError::SomethingWentWrong(e.to_string()))
+// }
+
 // #[cfg(test)]
 // mod tests {
 //     use super::*;

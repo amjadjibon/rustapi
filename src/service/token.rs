@@ -15,6 +15,7 @@ pub struct TokenService {
 pub trait TokenServiceTrait {
     fn new() -> Self;
     fn login(&self, user: User) -> Result<UserLoginResponseDto, TokenError>;
+    fn login_refresh(&self, refresh_token: String) -> Result<UserLoginRefreshResponseDto, TokenError>;
     const ACCESS_TOKEN_EXPIRATION: i64;
     const REFRESH_TOKEN_EXPIRATION: i64;
 }
@@ -77,7 +78,7 @@ impl TokenService {
         Ok(response)
     }
 
-    fn decode_token(&self, token: &str) -> Result<TokenData<Claims>, TokenError> {
+    pub fn decode_token(&self, token: &str) -> Result<TokenData<Claims>, TokenError> {
         let token_data = decode::<Claims>(
             token,
             &DecodingKey::from_secret(self.secret.as_ref()),

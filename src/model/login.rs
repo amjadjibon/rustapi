@@ -26,7 +26,7 @@ pub struct UserLoginRefreshRequestDto {
     pub refresh_token: String,
 }
 
-#[derive(Clone, Serialize, Deserialize, Validate)]
+#[derive(Clone, Serialize, Deserialize, Validate, Debug)]
 pub struct UserLoginRefreshResponseDto {
     pub access_token: String,
     pub refresh_token: String,

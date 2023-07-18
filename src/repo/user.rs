@@ -15,7 +15,7 @@ pub trait UserRepositoryTrait {
     fn new(db_conn: &Arc<Database>) -> Self;
     async fn create(&self, user: User) -> Result<User, Error>;
     async fn find_by_email(&self, email: String) -> Option<User>;
-    async fn find(&self, id: u64) -> Result<User, Error>;
+    async fn find(&self, id: i32) -> Option<User>;
 }
 
 #[async_trait]
@@ -54,7 +54,15 @@ impl UserRepositoryTrait for UserRepository {
         return user;
     }
 
-    async fn find(&self, _id: u64) -> Result<User, Error> {
-        unimplemented!("find user by id")
+    async fn find(&self, id: i32) -> Option<User> {
+        let user = sqlx::query_as::<_, User>(
+            "SELECT * FROM \"user\" WHERE id = $1",
+        )
+            .bind(id)
+            .fetch_optional(self.db_conn.get_pool())
+            .await
+            .unwrap_or(None);
+
+        return user;
     }
 }

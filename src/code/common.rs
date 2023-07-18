@@ -2,6 +2,11 @@ use crate::code::model::CodeObject;
 
 pub fn get_code_object(code: &str) -> CodeObject {
     match code {
+        "CODE_RS_200" => CodeObject::new(
+            "CODE_RS_200".to_string(),
+            "Request success".to_string(),
+            200,
+        ),
         "CODE_VE_400" => CodeObject::new(
             "CODE_VE_400".to_string(),
             "Validation error".to_string(),
