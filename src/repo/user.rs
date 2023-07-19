@@ -13,6 +13,7 @@ pub struct UserRepository {
 #[async_trait]
 pub trait UserRepositoryTrait {
     fn new(db_conn: &Arc<Database>) -> Self;
+    async fn get_tx(&self) -> Result<sqlx::Transaction<'_, sqlx::Postgres>, Error>;
     async fn create(&self, user: User) -> Result<User, Error>;
     async fn find_by_email(&self, email: String) -> Option<User>;
     async fn find(&self, id: i32) -> Option<User>;
@@ -24,6 +25,10 @@ impl UserRepositoryTrait for UserRepository {
         Self {
             db_conn: Arc::clone(db_conn),
         }
+    }
+
+    async fn get_tx(&self) -> Result<sqlx::Transaction<'_, sqlx::Postgres>, Error> {
+        return self.db_conn.get_pool().begin().await;
     }
 
     async fn create(&self, user: User) -> Result<User, Error> {
