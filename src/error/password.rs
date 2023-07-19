@@ -15,8 +15,8 @@ pub enum PasswordError {
 impl IntoResponse for PasswordError {
     fn into_response(self) -> Response {
         let code_object = match self {
-            PasswordError::InvalidPassword(error) => get_code_object("CODE_UE_400"),
-            PasswordError::SomethingWentWrong(error) => get_code_object("CODE_UE_400"),
+            PasswordError::InvalidPassword(_) => get_code_object("CODE_UE_400"),
+            PasswordError::SomethingWentWrong(_) => get_code_object("CODE_UE_400"),
         };
 
         ApiErrorResponse::send(code_object)

@@ -3,9 +3,9 @@ use axum::{http, http::Request, middleware::Next, response::IntoResponse};
 use axum::headers::authorization::{Authorization, Bearer};
 use axum::headers::Header;
 use tracing::info;
+
 use crate::error::api::ApiError;
 use crate::error::token::TokenError;
-use crate::repo::user::UserRepositoryTrait;
 use crate::state::token::TokenState;
 
 pub async fn auth<B>(

@@ -4,7 +4,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::code::model::CodeObject;
+use crate::model::code::CodeObject;
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct ApiSuccessResponse<T: Serialize> {
