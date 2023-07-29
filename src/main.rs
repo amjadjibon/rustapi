@@ -13,11 +13,11 @@ mod utils;
 mod middleware;
 
 use std::sync::Arc;
+use tokio::signal;
 use tracing::log::info;
 use conf::env;
 use tracing_subscriber;
-
-use crate::db::postgres::{Database,DatabaseTrait};
+use db::postgres::{Database,DatabaseTrait};
 
 #[tokio::main]
 async fn main() {
@@ -36,6 +36,33 @@ async fn main() {
 
     axum::Server::bind(&addr.parse().unwrap())
         .serve(route::root::routes(Arc::new(db_conn)))
+        .with_graceful_shutdown(shutdown_signal())
         .await
         .unwrap_or_else(|e| panic!("server error: {}", e.to_string()));
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+        let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+        let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    println!("signal received, starting graceful shutdown");
 }

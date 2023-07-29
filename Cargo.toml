@@ -16,6 +16,7 @@ envy = "0.4.2"
 hyper = { version = "0.14.27", features = ["full"] }
 jsonwebtoken = "8.3.0"
 lazy_static = "1.4.0"
+lettre = "0.10.4"
 password-hash = "0.5.0"
 rand = "0.8.5"
 serde = { version = "1.0.171", features = ["derive"] }
